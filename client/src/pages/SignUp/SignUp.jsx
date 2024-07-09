@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import useAuth from "../../hooks/useAuth";
 import axios from "axios";
@@ -14,6 +14,8 @@ const SignUp = () => {
     setLoading,
   } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state || "/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,11 +44,11 @@ const SignUp = () => {
 
       // 3. Save user name and photo in firebase
       await updateUserProfile(name, data.data.display_url);
-      navigate("/");
+      navigate(from);
       toast.success("SignUp Successful");
     } catch (err) {
       console.log(err);
-      toast.error(err.massage);
+      toast.error(err.message);
     }
   };
 
@@ -54,11 +56,11 @@ const SignUp = () => {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
-      navigate("/");
+      navigate(from);
       toast.success("SignUp Successful");
     } catch (err) {
       console.log(err);
-      toast.error(err.massage);
+      toast.error(err.message);
     }
   };
 

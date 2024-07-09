@@ -1,12 +1,17 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import { TbFidgetSpinner } from "react-icons/tb";
+import { useState } from "react";
 
 const Login = () => {
-  const { signIn, signInWithGoogle, loading, setLoading } = useAuth();
+  const { signIn, signInWithGoogle, loading, setLoading, resetPassword } =
+    useAuth();
+  const [email, setEmail] = useState();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state || "/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,20 +23,34 @@ const Login = () => {
       setLoading(true);
       // 1. sign in user
       await signIn(email, password);
-
-      await navigate("/");
+      navigate(from);
       toast.success("SignUp Successful");
     } catch (err) {
       console.log(err);
-      toast.error(err.massage);
+      toast.error(err.message);
+      setLoading(false);
     }
+  };
+
+  const handleResetPassword = async () => {
+    if (!email) return toast.error("Please write your email first");
+    try {
+      await resetPassword(email);
+      toast.success("Request Success! Check your email for further process...");
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      toast.error(err.message);
+      setLoading(false);
+    }
+    console.log(email);
   };
 
   // handle google signin
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
-      navigate("/");
+      navigate(from);
       toast.success("SignUp Successful");
     } catch (err) {
       console.log(err);
@@ -60,10 +79,10 @@ const Login = () => {
                 type="email"
                 name="email"
                 id="email"
-                required
                 placeholder="Enter Your Email Here"
                 className="w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-rose-500 bg-gray-200 text-gray-900"
                 data-temp-mail-org="0"
+                onBlur={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
@@ -77,7 +96,6 @@ const Login = () => {
                 name="password"
                 autoComplete="current-password"
                 id="password"
-                required
                 placeholder="*******"
                 className="w-full px-3 py-2 border rounded-md border-gray-300 focus:outline-rose-500 bg-gray-200 text-gray-900"
               />
@@ -92,13 +110,16 @@ const Login = () => {
               {loading ? (
                 <TbFidgetSpinner className="animate-spin m-auto" />
               ) : (
-                " Continue"
+                "Log In"
               )}
             </button>
           </div>
         </form>
         <div className="space-y-1">
-          <button className="text-xs hover:underline hover:text-rose-500 text-gray-400">
+          <button
+            onClick={handleResetPassword}
+            className="text-xs hover:underline hover:text-rose-500 text-gray-400"
+          >
             Forgot password?
           </button>
         </div>
