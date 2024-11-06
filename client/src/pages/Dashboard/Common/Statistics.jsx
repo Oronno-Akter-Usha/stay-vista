@@ -1,5 +1,9 @@
 const Statistics = () => {
-  return <div></div>;
+  return (
+    <div>
+      <h1>Welcome to dashboard: statistics page</h1>
+    </div>
+  );
 };
 
 export default Statistics;
