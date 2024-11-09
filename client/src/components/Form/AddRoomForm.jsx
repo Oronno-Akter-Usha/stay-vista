@@ -1,17 +1,10 @@
 import { categories } from "../Categories/CategoriesData";
 import { DateRange } from "react-date-range";
-import { useState } from "react";
-const AddRoomForm = () => {
-  const [state, setState] = useState([
-    {
-      startDate: new Date(),
-      endDate: null,
-      key: "selection",
-    },
-  ]);
+
+const AddRoomForm = ({ dates, handleDates, handleSubmit }) => {
   return (
     <div className="w-full min-h-[calc(100vh-40px)] flex flex-col justify-center items-center text-gray-800 rounded-xl bg-gray-50">
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           <div className="space-y-6">
             <div className="space-y-1 text-sm">
@@ -54,9 +47,9 @@ const AddRoomForm = () => {
               <DateRange
                 rangeColors={["#F43F5E"]}
                 editableDateInputs={true}
-                onChange={(item) => setState([item.selection])}
+                onChange={(item) => handleDates(item)}
                 moveRangeOnFirstSelection={false}
-                ranges={state}
+                ranges={[dates]}
               />
             </div>
           </div>
