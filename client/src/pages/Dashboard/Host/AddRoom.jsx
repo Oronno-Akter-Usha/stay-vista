@@ -5,6 +5,8 @@ import { imageUpload } from "../../../api/utils";
 
 const AddRoom = () => {
   const { user } = useAuth();
+  const [imagePreview, setImagePreview] = useState();
+  const [imageText, setImageText] = useState("Upload Image");
   const [dates, setDates] = useState({
     startDate: new Date(),
     endDate: null,
@@ -13,7 +15,6 @@ const AddRoom = () => {
 
   // Date range handler
   const handleDates = (item) => {
-    console.log(item);
     setDates(item.selection);
   };
 
@@ -59,17 +60,22 @@ const AddRoom = () => {
       console.log(err);
     }
   };
-  return (
-    <div>
-      <h1>Add Room Page...</h1>
 
-      {/*  Form */}
-      <AddRoomForm
-        dates={dates}
-        handleDates={handleDates}
-        handleSubmit={handleSubmit}
-      />
-    </div>
+  // handle image change
+  const handleImage = (image) => {
+    setImagePreview(URL.createObjectURL(image));
+    setImageText(image.name);
+  };
+  return (
+    <AddRoomForm
+      dates={dates}
+      handleDates={handleDates}
+      handleSubmit={handleSubmit}
+      imagePreview={imagePreview}
+      setImagePreview={setImagePreview}
+      handleImage={handleImage}
+      imageText={imageText}
+    />
   );
 };
 
