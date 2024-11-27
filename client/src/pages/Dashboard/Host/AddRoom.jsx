@@ -2,14 +2,22 @@ import { useState } from "react";
 import AddRoomForm from "../../../components/Form/AddRoomForm";
 import useAuth from "../../../hooks/useAuth";
 import { imageUpload } from "../../../api/utils";
+import { Helmet } from "react-helmet-async";
+import { useMutation } from "@tanstack/react-query";
+import useAxiosSecure from "./../../../hooks/useAxiosSecure";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const AddRoom = () => {
+  const navigate = useNavigate();
+  const axiosSecure = useAxiosSecure();
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const [imagePreview, setImagePreview] = useState();
   const [imageText, setImageText] = useState("Upload Image");
   const [dates, setDates] = useState({
     startDate: new Date(),
-    endDate: null,
+    endDate: new Date(),
     key: "selection",
   });
 
@@ -18,9 +26,23 @@ const AddRoom = () => {
     setDates(item.selection);
   };
 
+  const { mutateAsync } = useMutation({
+    mutationFn: async (roomData) => {
+      const { data } = await axiosSecure.post(`/room`, roomData);
+      return data;
+    },
+    onSuccess: () => {
+      console.log("Data Saved Successfully");
+      toast.success("Room Added Successfully");
+      navigate("/dashboard/my-listings");
+      setLoading(false);
+    },
+  });
+
   // Form handler
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const form = e.target;
     const location = form.location.value;
     const category = form.category.value;
@@ -53,11 +75,16 @@ const AddRoom = () => {
         bedrooms,
         host,
         description,
-        image_url,
+        image: image_url,
       };
       console.table(roomData);
+
+      // post request to server
+      await mutateAsync(roomData);
     } catch (err) {
       console.log(err);
+      toast.error(err.message);
+      setLoading(false);
     }
   };
 
@@ -67,15 +94,21 @@ const AddRoom = () => {
     setImageText(image.name);
   };
   return (
-    <AddRoomForm
-      dates={dates}
-      handleDates={handleDates}
-      handleSubmit={handleSubmit}
-      imagePreview={imagePreview}
-      setImagePreview={setImagePreview}
-      handleImage={handleImage}
-      imageText={imageText}
-    />
+    <>
+      <Helmet>
+        <title>Add Room | Dashboard</title>
+      </Helmet>
+      <AddRoomForm
+        dates={dates}
+        handleDates={handleDates}
+        handleSubmit={handleSubmit}
+        imagePreview={imagePreview}
+        setImagePreview={setImagePreview}
+        handleImage={handleImage}
+        imageText={imageText}
+        loading={loading}
+      />
+    </>
   );
 };
 
