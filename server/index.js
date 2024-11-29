@@ -5,7 +5,6 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
-
 const port = process.env.PORT || 8000;
 
 // middleware
@@ -49,6 +48,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const roomsCollection = client.db("stayVista").collection("rooms");
+    const usersCollection = client.db("stayVista").collection("users");
 
     // auth related api
     app.post("/jwt", async (req, res) => {
@@ -78,6 +78,33 @@ async function run() {
       } catch (err) {
         res.status(500).send(err);
       }
+    });
+
+    // save a user data in db
+    app.put("/user", async (req, res) => {
+      const user = req.body;
+      const query = { email: user?.email };
+      // check if user already exists in db
+      const isExist = await usersCollection.findOne(query);
+      if (isExist) return res.send(isExist);
+
+      const options = { upsert: true };
+
+      const updateDoc = {
+        $set: {
+          ...user,
+          timestamp: Date.now(), // Only added for new users
+        },
+      };
+
+      const result = await usersCollection.updateOne(query, updateDoc, options);
+      res.send(result);
+    });
+
+    // get all users data from db
+    app.get("/users", async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
     });
 
     // Get all rooms from db
