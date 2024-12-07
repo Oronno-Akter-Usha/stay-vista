@@ -94,9 +94,14 @@ const Sidebar = () => {
                 address="/dashboard"
                 icon={BsGraphUp}
               />
-
               {role === "guest" && <GuestMenu />}
-              {role === "host" && toggle ? <HostMenu /> : <GuestMenu />}
+              {role === "host" ? (
+                toggle ? (
+                  <HostMenu />
+                ) : (
+                  <GuestMenu />
+                )
+              ) : undefined}
               {role === "admin" && <AdminMenu />}
             </nav>
           </div>
