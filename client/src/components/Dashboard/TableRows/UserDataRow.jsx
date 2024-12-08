@@ -21,7 +21,7 @@ const UserDataRow = ({ user, refetch }) => {
       refetch();
       console.log(data);
       toast.success("User role updated successfully!");
-      // setIsOpen(false);
+      setIsOpen(false);
     },
   });
 

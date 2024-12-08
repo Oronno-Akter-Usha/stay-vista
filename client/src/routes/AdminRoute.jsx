@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 const AdminRoute = ({ children }) => {
   const [role, isLoading] = useRole();
   if (isLoading) return <LoadingSpinner />;
-  if (role === "host") return children;
+  if (role === "admin") return children;
   return <Navigate to="/dashboard" />;
 };
 

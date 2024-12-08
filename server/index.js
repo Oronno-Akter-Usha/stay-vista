@@ -159,7 +159,7 @@ async function run() {
     });
 
     // Get all rooms from db
-    app.get("/rooms", verifyToken, verifyHost, async (req, res) => {
+    app.get("/rooms", async (req, res) => {
       const category = req.query.category;
       let query = {};
       if (category && category !== "null") query = { category };
